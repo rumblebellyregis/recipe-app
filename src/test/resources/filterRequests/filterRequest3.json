@@ -1,0 +1,8 @@
+{
+  "recipeName": null,
+  "vegetarian": true,
+  "numberOfServings": null,
+  "instructionSearch": null,
+  "ingredientsContains": ["chocolate"],
+  "ingredientsNotContains": null
+}

@@ -40,7 +40,7 @@ public class RecipeController {
 
     @PutMapping(consumes = "application/json", produces = "application/json")
     @Transactional
-    public ResponseEntity<Recipe> updateRecipe(@RequestBody Recipe recipe) throws RecipeAppException {
+    public ResponseEntity<Recipe> updateRecipe(@RequestBody @Valid Recipe recipe) throws RecipeAppException {
         return new ResponseEntity<>(recipeService.updateRecipe(recipe), HttpStatus.OK);
     }
 

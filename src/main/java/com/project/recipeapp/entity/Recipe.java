@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,25 +25,27 @@ public class Recipe {
     private long id;
 
     @Size(max = 64)
-    @NotBlank
+    @NotBlank(message = "Field is required")
     private String name;
 
     @Size(max = 1000)
-    @NotBlank
+    @NotBlank(message = "Field is required")
     private String instructions;
 
     @Min(1)
+    @NotNull(message = "Field is required")
     private int numberOfServings;
 
-    @NotNull
-    private boolean isVegetarian;
+    @NotNull(message = "Field is required")
+    private Boolean isVegetarian;
 
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "recipe_id")
     @JsonManagedReference
     @NotEmpty(message = "Should not be empty")
-    private Set<Ingredient> ingredients;
+
+    private List<@Valid Ingredient> ingredients;
 
     public void addIngredient(Ingredient ingredient)
     {

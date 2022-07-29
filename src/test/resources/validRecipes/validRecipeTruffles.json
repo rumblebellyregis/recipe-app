@@ -1,0 +1,23 @@
+{
+  "name":"truffles",
+  "instructions":"Mix the condensed milk with shredded coconut and form marble sized balls. Drizzle with melted chocolate. Refrigerate for 2 hours.",
+  "numberOfServings":4,
+  "isVegetarian":true,
+  "ingredients":[
+    {
+      "name":"chocolate",
+      "unit":"bar",
+      "amount": 0.5
+    },
+    {
+      "name":"shredded coconut",
+      "unit":"grams",
+      "amount": 250
+    },
+    {
+      "name":"condensed milk",
+      "unit":"can",
+      "amount": 1
+    }
+  ]
+}

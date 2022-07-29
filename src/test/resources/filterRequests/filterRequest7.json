@@ -1,0 +1,8 @@
+{
+  "recipeName": null,
+  "vegetarian": null,
+  "numberOfServings": null,
+  "instructionSearch": null,
+  "ingredientsContains": ["cheese"],
+  "ingredientsNotContains": ["cheese"]
+}

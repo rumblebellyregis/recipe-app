@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -46,7 +47,7 @@ public class RecipeService {
         if(!CollectionUtils.isEmpty(filterForm.getIngredientsContains()) && !CollectionUtils.isEmpty(filterForm.getIngredientsNotContains())) {
             List<String> common = filterForm.getIngredientsContains().stream().filter(filterForm.getIngredientsNotContains()::contains).collect(Collectors.toList());
             if(!CollectionUtils.isEmpty(common)) {
-                throw  new RecipeAppException("Should not be in both lists", HttpStatus.BAD_REQUEST);
+                throw  new RecipeAppException(ErrorMessageEnum.INGREDIENT_NAME_SHOULD_NOT_BE_IN_BOTH_LISTS.getMessage(), HttpStatus.BAD_REQUEST);
             }
         }
         return repository.getRecipess(filterForm.getVegetarian(), filterForm.getNumberOfServings(),
@@ -59,15 +60,22 @@ public class RecipeService {
         updateIngredients(recipe, updatedRecipe);
         recipe.setInstructions(updatedRecipe.getInstructions());
         recipe.setName(updatedRecipe.getName());
-        recipe.setVegetarian(updatedRecipe.isVegetarian());
+        recipe.setIsVegetarian(updatedRecipe.getIsVegetarian());
         return repository.save(recipe);
     }
 
     private void updateIngredients(Recipe recipe, Recipe updatedRecipe) {
-        Set<Ingredient> currentIngredients = ingredientRepository.findByRecipe(recipe);
-        Set<Ingredient> updatedIngredients = updatedRecipe.getIngredients();
-        updatedIngredients.forEach(recipe::addIngredient);
-        currentIngredients.forEach(recipe::removeIngredient);
+        List<Ingredient> currentIngredients = ingredientRepository.findByRecipe(recipe);
+        List<Ingredient> updatedIngredients = updatedRecipe.getIngredients();
+        List<Ingredient> toAdd = updatedIngredients.stream()
+                .filter(element -> !currentIngredients.contains(element))
+                .collect(Collectors.toList());
+
+        List<Ingredient> toRemove = currentIngredients.stream()
+                .filter(element -> !updatedIngredients.contains(element))
+                .collect(Collectors.toList());
+        toAdd.forEach(recipe::addIngredient);
+        toRemove.forEach(recipe::removeIngredient);
     }
 
     private Recipe getRecipe(Long recipeId) throws RecipeAppException {

@@ -25,4 +25,3 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                              @Param("contains") List<String> contains, @Param("notContains") List<String> notContains);
 
 }
-//and (COALESCE(:contains) is null or i.name  :contains) //@Param("contains") List<String> contains,

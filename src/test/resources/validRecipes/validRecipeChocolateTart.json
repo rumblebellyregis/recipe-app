@@ -1,0 +1,29 @@
+{
+  "name":"chocolate tart",
+  "instructions":"Melt the chocolate in boiled heavy cream. Mix the melted butter with biscuit crums and press on a tart pan to make a base. Pour the chocolate cream mixture on the base and refrigerate overnight. Serve cold.",
+  "numberOfServings":8,
+  "isVegetarian":true,
+  "ingredients":[
+    {
+      "name":"chocolate",
+      "unit":"grams",
+      "amount": 400
+
+    },
+    {
+      "name":"heavy cream",
+      "unit":"ml",
+      "amount": 250
+    },
+    {
+      "name":"biscuit crums",
+      "unit":"cup",
+      "amount": 2
+    },
+    {
+      "name":"butter",
+      "unit":"grams",
+      "amount": 125
+    }
+  ]
+}

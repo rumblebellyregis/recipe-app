@@ -12,5 +12,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleException(RecipeAppException recipeAppException) {
         return new ResponseEntity<>(recipeAppException.getMessage(), recipeAppException.getHttpStatus());
     }
+
 }
 

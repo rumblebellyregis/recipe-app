@@ -1,0 +1,23 @@
+{
+  "name":"salami tosti",
+  "instructions":"Slice the mozzarella cheese. Put the pieces of salami and cheese in the middle of 2 slices of bread. Toast both sides in the grill or on the frying pan.",
+  "numberOfServings":1,
+  "isVegetarian":false,
+  "ingredients":[
+    {
+      "name":"bread",
+      "unit":"slice",
+      "amount": 2
+    },
+    {
+      "name":"mozzarella cheese",
+      "unit":"grams",
+      "amount": 100
+    },
+    {
+      "name":"salami",
+      "unit":"piece",
+      "amount": 4
+    }
+  ]
+}
