@@ -24,5 +24,5 @@ $ mvn spring-boot:run
 --------------------------------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
 `api/v1/recipe`                 | POST      | To add a new recipe, request body must contain a valid recipe. If recipe not valid, then the response will be a bad request.                                 |
 `api/v1/recipe`                 | GET       | To receive a recipe. If any filter is not selected, then all recipes will return. If the filter form is filled, the results will be filtered accordingly.    |
-`api/v1/recipe` 	            | PUT       | To update a recipe. It must send a valid recipe which is holding the recipe id to update. If recipe is not found, then the response will be Not Found Error. |
-`api/v1/recipe` 	            | DELETE    | To delete a recipe. Recipe id must also be passed with as a request parameter. If recipe is not found, then the response will be Not Found Error.            |
+`api/v1/recipe` 	        | PUT       | To update a recipe. It must send a valid recipe which is holding the recipe id to update. If recipe is not found, then the response will be Not Found Error. |
+`api/v1/recipe` 	        | DELETE    | To delete a recipe. Recipe id must also be passed with as a request parameter. If recipe is not found, then the response will be Not Found Error.            |
