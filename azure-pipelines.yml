@@ -25,5 +25,9 @@ steps:
 - task: htmltemplate@0
   inputs:
     pathToHtmlFile: '/home/vsts/work/1/s/CCReport43F6D5EF/index.html'
-    tabName: 'testt'
+    tabName: 'Test Results'
     inputType: 'singleHtml'
+- task: Docker@2
+  inputs:
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
