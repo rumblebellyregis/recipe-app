@@ -90,9 +90,9 @@ public class IntegrationTests {
 
     @Test
     public void return_ok_when_recipe_update_succeeds() throws Exception {
-        String response = saveRecipe();
+        String response = saveRecipe("validRecipes/validRecipeFries.json");
         Recipe recipe = new ObjectMapper().readValue(response, Recipe.class);
-        File resource = new ClassPathResource("validRecipes/validRecipeNachos.json").getFile();
+        File resource = new ClassPathResource("validRecipes/validRecipeUpdateFries.json").getFile();
         String text = new String(Files.readAllBytes(resource.toPath()));
         String newString = text.charAt(0)
                 + " \"id\":" + recipe.getId() + ","
@@ -101,6 +101,9 @@ public class IntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(newString)).andReturn();
         assertThat(result.getResponse().getStatus(), is(200));
+        Recipe updatedRecipe = new ObjectMapper().readValue(result.getResponse().getContentAsString(), Recipe.class);
+        assertEquals("Cut the potato into sticks. Deep fry in vegetable oil.", updatedRecipe.getInstructions());
+        assertEquals(2, updatedRecipe.getIngredients().size());
     }
     @Test
     public void return_not_found_when_recipe_to_update_not_exists() throws Exception {

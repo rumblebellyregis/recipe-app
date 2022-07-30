@@ -1,0 +1,18 @@
+{
+  "name":"fries",
+  "instructions":"Cut the potato into sticks. Deep fry in vegetable oil.",
+  "numberOfServings":6,
+  "isVegetarian":false,
+  "ingredients":[
+    {
+      "name":"potato",
+      "unit":"kilos",
+      "amount": 1.5
+    },
+    {
+      "name":"vegetable oil",
+      "unit":"liter",
+      "amount": 1
+    }
+  ]
+}

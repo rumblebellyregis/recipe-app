@@ -122,19 +122,27 @@ public class RecipeServiceShould {
         ingredient.setName("tomato");
         ingredient.setAmount(BigDecimal.valueOf(3));
         ingredient.setUnit("pieces");
-        return  new LinkedList<>(Arrays.asList(ingredient));
+        Ingredient ingredientTwo = new Ingredient();
+        ingredientTwo.setName("potato");
+        ingredientTwo.setAmount(BigDecimal.valueOf(3));
+        ingredientTwo.setUnit("pieces");
+        return  new LinkedList<>(Arrays.asList(ingredient, ingredientTwo));
     }
 
     private List<Ingredient> getUpdatedIngredients() {
         Ingredient ingredient = new Ingredient();
         ingredient.setName("tomato");
-        ingredient.setAmount(BigDecimal.valueOf(5));
+        ingredient.setAmount(BigDecimal.valueOf(3));
         ingredient.setUnit("pieces");
         Ingredient ingredientTwo = new Ingredient();
         ingredientTwo.setName("potato");
         ingredientTwo.setAmount(BigDecimal.valueOf(5));
         ingredientTwo.setUnit("pieces");
-        return new LinkedList<>(Arrays.asList(ingredient, ingredientTwo));
+        Ingredient ingredientThree = new Ingredient();
+        ingredientThree.setName("fish");
+        ingredientThree.setAmount(BigDecimal.valueOf(2));
+        ingredientThree.setUnit("pieces");
+        return new LinkedList<>(Arrays.asList(ingredient, ingredientTwo, ingredientThree));
     }
 
     private FilterForm getInvalidFilterForm() {

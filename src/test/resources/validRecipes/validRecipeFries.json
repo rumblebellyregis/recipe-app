@@ -1,0 +1,13 @@
+{
+  "name":"fries",
+  "instructions":"Cut the potato into sticks. Deep fry in oil.",
+  "numberOfServings":6,
+  "isVegetarian":false,
+  "ingredients":[
+    {
+      "name":"potato",
+      "unit":"kilos",
+      "amount": 1.5
+    }
+  ]
+}

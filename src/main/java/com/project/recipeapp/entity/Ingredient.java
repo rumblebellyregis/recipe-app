@@ -37,4 +37,17 @@ public class Ingredient {
     @JsonBackReference
     private Recipe recipe;
 
+    @Override
+    public  boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Ingredient)) {
+            return false;
+        }
+        Ingredient ing = (Ingredient) o;
+        return ((ing.getAmount().compareTo(amount) == 0) && ing.getName().equals(name) && ing.getUnit().equals(unit));
+
+
+    }
 }

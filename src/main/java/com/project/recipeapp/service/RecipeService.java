@@ -67,15 +67,16 @@ public class RecipeService {
     private void updateIngredients(Recipe recipe, Recipe updatedRecipe) {
         List<Ingredient> currentIngredients = ingredientRepository.findByRecipe(recipe);
         List<Ingredient> updatedIngredients = updatedRecipe.getIngredients();
-        List<Ingredient> toAdd = updatedIngredients.stream()
-                .filter(element -> !currentIngredients.contains(element))
-                .collect(Collectors.toList());
-
-        List<Ingredient> toRemove = currentIngredients.stream()
-                .filter(element -> !updatedIngredients.contains(element))
-                .collect(Collectors.toList());
+        List<Ingredient> toAdd = getDifferences(currentIngredients, updatedIngredients);
+        List<Ingredient> toRemove = getDifferences(updatedIngredients, currentIngredients);
         toAdd.forEach(recipe::addIngredient);
         toRemove.forEach(recipe::removeIngredient);
+    }
+
+    private List<Ingredient> getDifferences(List<Ingredient> currentIngredients, List<Ingredient> updatedIngredients) {
+        return updatedIngredients.stream()
+                .filter(element -> !currentIngredients.contains(element))
+                .collect(Collectors.toList());
     }
 
     private Recipe getRecipe(Long recipeId) throws RecipeAppException {
