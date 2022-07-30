@@ -6,6 +6,16 @@
 
 trigger:
 - master
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'f5d4dde2-24e4-4a01-969a-c41c1ec71a2d'
+  imageRepository: 'recipeapp'
+  containerRegistry: 'hakanscontainers.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/DockerFile'
+  tag: '$(Build.BuildId)'
 
 pool:
   vmImage: ubuntu-latest
@@ -28,6 +38,13 @@ steps:
     tabName: 'Tests'
     inputType: 'singleHtml'
 - task: Docker@2
+  displayName: Build and push an image to container registry
   inputs:
-    command: 'build'
-    Dockerfile: '**/DockerFile'
+    command: buildAndPush
+    repository: $(imageRepository)
+    dockerfile: $(dockerfilePath)
+    containerRegistry: $(dockerRegistryServiceConnection)
+    tags: |
+      $(tag)
+
+
