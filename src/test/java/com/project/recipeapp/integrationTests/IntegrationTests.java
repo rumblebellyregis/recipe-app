@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -51,8 +53,7 @@ public class IntegrationTests {
 
     @Test
     public void return_ok_when_recipe_created() throws Exception {
-        File resource = new ClassPathResource("validRecipes/validRecipeChocolateTart.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("validRecipes/validRecipeChocolateTart.json");
         final MvcResult result = this.mockMvc.perform(post(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
@@ -61,8 +62,7 @@ public class IntegrationTests {
 
     @Test
     public void return_bad_request_when_recipe_missing_fields() throws Exception {
-        File resource = new ClassPathResource("invalidRecipes/invalidRecipeCafeLatte.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("invalidRecipes/invalidRecipeCafeLatte.json");
         final MvcResult result = this.mockMvc.perform(post(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
@@ -80,7 +80,7 @@ public class IntegrationTests {
 
     @Test
     public void return_ok_when_delete_successful() throws Exception {
-        String response = saveRecipe();
+        String response = saveRecipe("validRecipes/validRecipeChocolateTart.json");
         Recipe recipe = new ObjectMapper().readValue(response, Recipe.class);
         final MvcResult result = this.mockMvc.perform(delete(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -92,11 +92,8 @@ public class IntegrationTests {
     public void return_ok_when_recipe_update_succeeds() throws Exception {
         String response = saveRecipe("validRecipes/validRecipeFries.json");
         Recipe recipe = new ObjectMapper().readValue(response, Recipe.class);
-        File resource = new ClassPathResource("validRecipes/validRecipeUpdateFries.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
-        String newString = text.charAt(0)
-                + " \"id\":" + recipe.getId() + ","
-                + text.substring(1);
+        String text = getRequestJSon("validRecipes/validRecipeUpdateFries.json");
+        String newString = addIdToRequestJson(recipe, text);
         final MvcResult result = this.mockMvc.perform(put(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(newString)).andReturn();
@@ -105,10 +102,12 @@ public class IntegrationTests {
         assertEquals("Cut the potato into sticks. Deep fry in vegetable oil.", updatedRecipe.getInstructions());
         assertEquals(2, updatedRecipe.getIngredients().size());
     }
+
+
+
     @Test
     public void return_not_found_when_recipe_to_update_not_exists() throws Exception {
-        File resource = new ClassPathResource("validRecipes/validRecipeSalamiTosti.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("validRecipes/validRecipeSalamiTosti.json");
         String newString = text.charAt(0)
                 + " \"id\":10000,"
                 + text.substring(1);
@@ -122,9 +121,8 @@ public class IntegrationTests {
 
     @Test
     public void return_bad_request_when_recipe_to_update_have_invalid_fields() throws Exception {
-        saveRecipe();
-        File resource = new ClassPathResource("invalidRecipes/invalidRecipeCafeLatte.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        saveRecipe("validRecipes/validRecipeChocolateTart.json");
+        String text = getRequestJSon("invalidRecipes/invalidRecipeCafeLatte.json");
         final MvcResult result = this.mockMvc.perform(put(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
@@ -137,14 +135,12 @@ public class IntegrationTests {
         saveRecipe("validRecipes/validRecipeNachos.json");
         saveRecipe("validRecipes/validRecipeSalamiTosti.json");
         saveRecipe("validRecipes/validRecipeTruffles.json");
-        File resource = new ClassPathResource("filterRequests/filterRequest1.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("filterRequests/filterRequest1.json");
         final MvcResult result = this.mockMvc.perform(get(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
         assertThat(result.getResponse().getStatus(), is(200));
-        ObjectMapper mapper = new ObjectMapper();
-        List<Recipe> recipes = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, Recipe.class));
+        List<Recipe> recipes = extractRecipesFromResponse(result);
         assertEquals(4, recipes.size());
     }
 
@@ -154,14 +150,12 @@ public class IntegrationTests {
         saveRecipe("validRecipes/validRecipeNachos.json");
         saveRecipe("validRecipes/validRecipeSalamiTosti.json");
         saveRecipe("validRecipes/validRecipeTruffles.json");
-        File resource = new ClassPathResource("filterRequests/filterRequest2.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("filterRequests/filterRequest2.json");
         final MvcResult result = this.mockMvc.perform(get(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
         assertThat(result.getResponse().getStatus(), is(200));
-        ObjectMapper mapper = new ObjectMapper();
-        List<Recipe> recipes = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, Recipe.class));
+        List<Recipe> recipes = extractRecipesFromResponse(result);
         assertEquals(1, recipes.size());
         assertEquals("salami tosti", recipes.get(0).getName());
     }
@@ -172,14 +166,12 @@ public class IntegrationTests {
         saveRecipe("validRecipes/validRecipeNachos.json");
         saveRecipe("validRecipes/validRecipeSalamiTosti.json");
         saveRecipe("validRecipes/validRecipeTruffles.json");
-        File resource = new ClassPathResource("filterRequests/filterRequest3.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("filterRequests/filterRequest3.json");
         final MvcResult result = this.mockMvc.perform(get(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
         assertThat(result.getResponse().getStatus(), is(200));
-        ObjectMapper mapper = new ObjectMapper();
-        List<Recipe> recipes = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, Recipe.class));
+        List<Recipe> recipes = extractRecipesFromResponse(result);
         assertEquals(2, recipes.size());
         Assertions.assertThat(recipes)
                 .extracting(Recipe::getName)
@@ -192,14 +184,12 @@ public class IntegrationTests {
         saveRecipe("validRecipes/validRecipeNachos.json");
         saveRecipe("validRecipes/validRecipeSalamiTosti.json");
         saveRecipe("validRecipes/validRecipeTruffles.json");
-        File resource = new ClassPathResource("filterRequests/filterRequest4.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("filterRequests/filterRequest4.json");
         final MvcResult result = this.mockMvc.perform(get(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
         assertThat(result.getResponse().getStatus(), is(200));
-        ObjectMapper mapper = new ObjectMapper();
-        List<Recipe> recipes = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, Recipe.class));
+        List<Recipe> recipes = extractRecipesFromResponse(result);
         assertEquals(1, recipes.size());
         assertEquals("truffles", recipes.get(0).getName());
     }
@@ -210,14 +200,12 @@ public class IntegrationTests {
         saveRecipe("validRecipes/validRecipeNachos.json");
         saveRecipe("validRecipes/validRecipeSalamiTosti.json");
         saveRecipe("validRecipes/validRecipeTruffles.json");
-        File resource = new ClassPathResource("filterRequests/filterRequest5.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("filterRequests/filterRequest5.json");
         final MvcResult result = this.mockMvc.perform(get(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
         assertThat(result.getResponse().getStatus(), is(200));
-        ObjectMapper mapper = new ObjectMapper();
-        List<Recipe> recipes = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, Recipe.class));
+        List<Recipe> recipes = extractRecipesFromResponse(result);
         assertEquals(1, recipes.size());
         assertEquals("nachos", recipes.get(0).getName());
     }
@@ -228,19 +216,19 @@ public class IntegrationTests {
         saveRecipe("validRecipes/validRecipeNachos.json");
         saveRecipe("validRecipes/validRecipeSalamiTosti.json");
         saveRecipe("validRecipes/validRecipeTruffles.json");
-        File resource = new ClassPathResource("filterRequests/filterRequest6.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("filterRequests/filterRequest6.json");
         final MvcResult result = this.mockMvc.perform(get(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
         assertThat(result.getResponse().getStatus(), is(200));
-        ObjectMapper mapper = new ObjectMapper();
-        List<Recipe> recipes = mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, Recipe.class));
+        List<Recipe> recipes = extractRecipesFromResponse(result);
         assertEquals(2, recipes.size());
         Assertions.assertThat(recipes)
                 .extracting(Recipe::getName)
                 .anyMatch(value -> value.matches("chocolate tart")).anyMatch(val -> val.matches("truffles"));
     }
+
+
 
     @Test
     public void return_bad_request_when_contains_and_not_contains_same_item() throws Exception {
@@ -248,31 +236,34 @@ public class IntegrationTests {
         saveRecipe("validRecipes/validRecipeNachos.json");
         saveRecipe("validRecipes/validRecipeSalamiTosti.json");
         saveRecipe("validRecipes/validRecipeTruffles.json");
-        File resource = new ClassPathResource("filterRequests/filterRequest7.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon("filterRequests/filterRequest7.json");
         final MvcResult result = this.mockMvc.perform(get(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
         assertThat(result.getResponse().getStatus(), is(400));
     }
 
-    private String saveRecipe() throws Exception {
-        File resource = new ClassPathResource("validRecipes/validRecipeChocolateTart.json").getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
-        final MvcResult result = this.mockMvc.perform(post(RECIPE_CONTROLLER_ENDPOINT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(text)).andReturn();
-        return result.getResponse().getContentAsString();
-    }
-
     private String saveRecipe(String path) throws Exception {
-        File resource = new ClassPathResource(path).getFile();
-        String text = new String(Files.readAllBytes(resource.toPath()));
+        String text = getRequestJSon(path);
         final MvcResult result = this.mockMvc.perform(post(RECIPE_CONTROLLER_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(text)).andReturn();
         return result.getResponse().getContentAsString();
     }
 
+    private List<Recipe> extractRecipesFromResponse(MvcResult result) throws com.fasterxml.jackson.core.JsonProcessingException, UnsupportedEncodingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(result.getResponse().getContentAsString(), mapper.getTypeFactory().constructCollectionType(List.class, Recipe.class));
+    }
 
+    private String getRequestJSon(String s) throws IOException {
+        File resource = new ClassPathResource(s).getFile();
+        return new String(Files.readAllBytes(resource.toPath()));
+    }
+
+    private String addIdToRequestJson(Recipe recipe, String text) {
+        return text.charAt(0)
+                + " \"id\":" + recipe.getId() + ","
+                + text.substring(1);
+    }
 }

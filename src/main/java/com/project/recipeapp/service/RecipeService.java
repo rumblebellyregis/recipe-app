@@ -44,17 +44,13 @@ public class RecipeService {
     }
 
     public List<Recipe> getRecipes(FilterForm  filterForm) throws RecipeAppException {
-        if(!CollectionUtils.isEmpty(filterForm.getIngredientsContains()) && !CollectionUtils.isEmpty(filterForm.getIngredientsNotContains())) {
-            List<String> common = filterForm.getIngredientsContains().stream().filter(filterForm.getIngredientsNotContains()::contains).collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(common)) {
-                throw  new RecipeAppException(ErrorMessageEnum.INGREDIENT_NAME_SHOULD_NOT_BE_IN_BOTH_LISTS.getMessage(), HttpStatus.BAD_REQUEST);
-            }
-        }
+        checkContainsAndNotContainsListHaveSAmeValues(filterForm);
         return repository.getRecipess(filterForm.getVegetarian(), filterForm.getNumberOfServings(),
                 filterForm.getRecipeName(), filterForm.getInstructionSearch(),
                 filterForm.getIngredientsContains(), filterForm.getIngredientsNotContains());
 
     }
+
     public Recipe updateRecipe(Recipe updatedRecipe) throws RecipeAppException {
         Recipe recipe = getRecipe(updatedRecipe.getId());
         updateIngredients(recipe, updatedRecipe);
@@ -84,5 +80,14 @@ public class RecipeService {
             log.info("Recipe with id {} not found", recipeId);
             return new RecipeAppException(ErrorMessageEnum.RECIPE_NOT_FOUND_MESSAGE.getMessage(), HttpStatus.NOT_FOUND);
         });
+    }
+
+    private void checkContainsAndNotContainsListHaveSAmeValues(FilterForm filterForm) throws RecipeAppException {
+        if(!CollectionUtils.isEmpty(filterForm.getIngredientsContains()) && !CollectionUtils.isEmpty(filterForm.getIngredientsNotContains())) {
+            List<String> common = filterForm.getIngredientsContains().stream().filter(filterForm.getIngredientsNotContains()::contains).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(common)) {
+                throw  new RecipeAppException(ErrorMessageEnum.INGREDIENT_NAME_SHOULD_NOT_BE_IN_BOTH_LISTS.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
     }
 }
